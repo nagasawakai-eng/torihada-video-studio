@@ -1,0 +1,19 @@
+{
+  "name": "torihada-video-studio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "研修資料(PPTX)から台本入力・音声読み上げ・MP4動画を作成する社内ツール",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.10",
+    "dotenv": "^17.4.2",
+    "express": "^4.19.2",
+    "google-auth-library": "^9.14.1",
+    "multer": "^2.0.0",
+    "pdf-to-img": "^6.1.0"
+  }
+}
