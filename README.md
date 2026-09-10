@@ -43,13 +43,30 @@ Windowsの場合は LibreOffice を通常のインストーラでインストー
 
 1. GitHubに新規リポジトリを作成しこのフォルダをpush
 2. Railwayで「New Project」→「Deploy from GitHub repo」で選択
-3. Railwayの Variables に以下を設定
+3. **Volume（永続ボリューム）を追加し、`/data-persist` にマウントする**（下記「データの永続化」参照）
+4. Railwayの Variables に以下を設定
    - `FISHAUDIO_API_KEY`
    - `GOOGLE_CLIENT_ID` / `ALLOWED_DOMAIN` / `SESSION_SECRET`（社内限定公開用。下記手順で取得）
-4. デプロイ完了後に発行されるURLが新しいエディターのリンクになります
+   - `DATA_DIR=/data-persist/data`
+   - `MATERIALS_DIR=/data-persist/materials`
+5. デプロイ完了後に発行されるURLが新しいエディターのリンクになります
 
 既存の `torihada-pptx-editor` サービスとは別のRailwayサービスとして作成してください
 （同じサービスを上書きしないよう注意）。
+
+### データの永続化（重要）
+
+Railwayはデプロイ・再起動のたびにコンテナのファイルシステムを作り直します。
+`DATA_DIR` / `MATERIALS_DIR` を設定せずデプロイすると、**編集した台本やアップロードした
+資料が次のデプロイ／再起動で消えます**（旧`torihada-pptx-editor`で発生していた不具合の原因）。
+
+これを防ぐため、RailwayのService設定 → 「Volumes」で新規ボリュームを作成し、
+マウントパスを `/data-persist` に設定してください。上記の環境変数（`DATA_DIR` / `MATERIALS_DIR`）
+とあわせて、台本・資料がボリューム側に保存され、デプロイ・再起動をまたいで保持されます。
+
+初回起動時のみ、gitにコミットされた初期データ（`seed/`）が自動的にボリュームへコピーされます
+（week1の引き継ぎ台本、week1〜3の資料）。2回目以降の起動ではボリューム側の内容が優先され、
+上書きされません。
 
 ## 社内限定公開（Googleログイン）の設定手順
 
@@ -81,9 +98,10 @@ server/           Expressサーバー本体
   lib/video.js    台本+スライド画像 → 動画セグメント → 結合 のジョブ管理
   lib/store.js    週設定・台本(JSON)・資料ファイルの読み書き
 public/           フロントエンド（素のHTML/CSS/JS）
-data/weeks.json   週の一覧設定
-data/scripts/     週ごとの台本(JSON)。week1は旧エディターの台本を引き継ぎ済み
-materials/        週ごとのPPTX資料
+seed/             初期データ（git管理）。初回起動時のみdata/materialsへコピーされる
+data/weeks.json   週の一覧設定（実行時データ。gitignore対象、Railwayではボリュームに保存）
+data/scripts/     週ごとの台本(JSON)（実行時データ。同上）
+materials/        週ごとのPPTX資料（実行時データ。同上）
 preview/          生成したスライドPNGのキャッシュ（gitignore対象）
 ```
 

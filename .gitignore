@@ -4,3 +4,8 @@ preview/
 tmp/
 *.log
 .DS_Store
+
+# 実行時に書き込まれるデータ。gitの初期データは seed/ を参照。
+# Railway本番ではこの2つを永続ボリュームにマウントすること（DATA_DIR / MATERIALS_DIR）。
+/data/
+/materials/

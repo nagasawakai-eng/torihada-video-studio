@@ -31,6 +31,9 @@
 
 - GitHubリポジトリ: https://github.com/nagasawakai-eng/torihada-video-studio （Public）
 - Railway（Dockerfileベース）を想定。既存の`torihada-pptx-editor`とは別サービスとして作成すること
+- **永続ボリュームを`/data-persist`にマウントし、`DATA_DIR=/data-persist/data` /
+  `MATERIALS_DIR=/data-persist/materials` を設定すること。**未設定だと再デプロイ・再起動で
+  台本編集・資料アップロードが消える（旧`torihada-pptx-editor`で実際に発生した不具合と同じ原因）
 - 詳細な環境変数・Google OAuth設定手順は `README.md` 参照
 
 ## ファイル構成
